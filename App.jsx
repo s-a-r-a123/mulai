@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { MapContainer, TileLayer, useMap, Marker } from "react-leaflet";
+import React, { useState, useRef, useEffect } from "react";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import jsPDF from "jspdf";
 import "leaflet/dist/leaflet.css";
@@ -17,9 +17,13 @@ L.Icon.Default.mergeOptions({
 // Component to move map when coordinates are searched
 function MapMover({ coords }) {
   const map = useMap();
-  if (coords) {
-    map.setView(coords, 10);
-  }
+
+  useEffect(() => {
+    if (coords) {
+      map.setView(coords, 10); // Adjust zoom level as per requirements
+    }
+  }, [coords, map]);
+
   return null;
 }
 
@@ -72,7 +76,7 @@ export default function App() {
 
   function downloadReport() {
     const doc = new jsPDF();
-    doc.text("Decision Report", 20, 20);
+    doc.text("Mullai Decision Report", 20, 20);
     if (decision) {
       doc.text(`Decision: ${decision.decision}`, 20, 40);
       doc.text(`Reason: ${decision.reason}`, 20, 50);
@@ -81,7 +85,7 @@ export default function App() {
     } else {
       doc.text("No decision available", 20, 40);
     }
-    doc.save("report.pdf");
+    doc.save("mullai_report.pdf");
   }
 
   async function handleSearch(e) {
@@ -100,9 +104,7 @@ export default function App() {
 
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          searchInput
-        )}`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchInput)}`
       );
       const data = await res.json();
       if (data.length > 0) {
@@ -123,26 +125,65 @@ export default function App() {
       {/* Top Navbar */}
       <div
         style={{
-          background: "#1a237e",
+          background: "#29824eff",
           color: "white",
-          padding: "15px 30px",
+          padding: "12px 30px",
+          height: 100,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
         }}
       >
-        <h2>🌱 Mullai</h2>
-        <div>
-          <span style={{ margin: "0 15px", cursor: "pointer" }} onClick={() => setActiveTab("map")}>
+        {/* Logo (Pacifico font) */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <img
+            src="/logom.png" // Logo path (ensure it's in the public folder)
+            alt="Mullai Logo"
+            style={{ width: "80px", height: "80px" }}
+          />
+          <h2
+            style={{
+              fontFamily: "'Story Script', cursive",
+              fontSize: "58px",
+              fontWeight: "bold",
+              color: "#ffffff",
+              textShadow: "2px 2px 6px rgba(0,0,0,0.4)",
+              margin: 0,
+            }}
+          >
+            Mullai
+          </h2>
+        </div>
+        {/* Navbar Links (Dosis font) */}
+        <div
+          style={{
+            fontFamily: "'Dosis', sans-serif",
+            fontSize: "18px",
+            fontWeight: "600",
+          }}
+        >
+          <span
+            style={{ margin: "0 15px", cursor: "pointer" }}
+            onClick={() => setActiveTab("map")}
+          >
             🗺️ Map
           </span>
-          <span style={{ margin: "0 15px", cursor: "pointer" }} onClick={() => setActiveTab("about")}>
+          <span
+            style={{ margin: "0 15px", cursor: "pointer" }}
+            onClick={() => setActiveTab("about")}
+          >
             ℹ️ About
           </span>
-          <span style={{ margin: "0 15px", cursor: "pointer" }} onClick={() => setActiveTab("decision")}>
+          <span
+            style={{ margin: "0 15px", cursor: "pointer" }}
+            onClick={() => setActiveTab("decision")}
+          >
             📄 Decision
           </span>
-          <span style={{ margin: "0 15px", cursor: "pointer" }} onClick={() => setActiveTab("appeal")}>
+          <span
+            style={{ margin: "0 15px", cursor: "pointer" }}
+            onClick={() => setActiveTab("appeal")}
+          >
             ⚖️ Appeal
           </span>
         </div>
@@ -177,12 +218,26 @@ export default function App() {
                   placeholder="Enter coordinates (lat, lon) or place name"
                   style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
                 />
-                <button type="submit" style={{ padding: "8px", width: "100%" }}>
+                <button
+                  type="submit"
+                  style={{
+                    padding: "10px",
+                    background: "#2f8252ff",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                    width: "100%",
+                  }}
+                >
                   🔍 Search
                 </button>
               </form>
 
-              <label><b>Purpose of Land:</b></label><br />
+              <label>
+                <b>Purpose of Land:</b>
+              </label>
+              <br />
               <select
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value)}
@@ -199,7 +254,7 @@ export default function App() {
                 style={{
                   marginTop: "10px",
                   padding: "10px",
-                  background: "#1a237e",
+                  background: "#29824eff",
                   color: "white",
                   border: "none",
                   borderRadius: "5px",
@@ -214,26 +269,61 @@ export default function App() {
         )}
 
         {activeTab === "decision" && (
-          <div style={{ padding: 30 }}>
+          <div style={{ padding: 30, fontFamily: "'Crimson Text', serif", fontSize: "20px" }}>
             <h2 style={{ color: "#1a237e" }}>📄 Decision</h2>
             {claimed && decision ? (
               <div>
-                <p><b>Decision:</b> {decision.decision}</p>
-                <p><b>Reason:</b> {decision.reason}</p>
-                <p><b>Purpose:</b> {decision.purpose}</p>
-                <p><b>Coordinates:</b> {decision.lat}, {decision.lon}</p>
-                <button
-                  onClick={downloadReport}
-                  style={{ marginTop: "10px", padding: "10px", background: "green", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
-                >
-                  Download Report (PDF)
-                </button>
-                <button
-                  onClick={handleAppeal}
-                  style={{ marginTop: "10px", marginLeft: "10px", padding: "10px", background: "orange", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}
-                >
-                  Appeal Decision
-                </button>
+                <p>
+                  <b>Decision:</b> {decision.decision}
+                </p>
+                <p>
+                  <b>Reason:</b> {decision.reason}
+                </p>
+                <p>
+                  <b>Purpose:</b> {decision.purpose}
+                </p>
+                <p>
+                  <b>Coordinates:</b> {decision.lat}, {decision.lon}
+                </p>
+
+                {/* Buttons below the decision */}
+                <div style={{ marginTop: "20px", display: "flex", gap: "20px" }}>
+                  {/* Download Report Button */}
+                  <button
+                    onClick={downloadReport}
+                    style={{
+                      padding: "10px",
+                      background: "#2f8252ff",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                      height: 60,
+                      width: "100%", // Ensure the width is consistent with Appeal Claim
+                      maxWidth: "200px", // Set max width to keep it similar size
+                    }}
+                  >
+                    📄 Download Report PDF
+                  </button>
+
+                  {/* Appeal Claim Button */}
+                  <button
+                    onClick={handleAppeal}
+                    style={{
+                      padding: "10px",
+                      background: "#29824eff",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                      height: 50,
+                      width: "100%", // Ensure the width is consistent with Download Report
+                      maxWidth: "200px", // Set max width to keep it similar size
+                    }}
+                  >
+                    ⚖️ Appeal Claim
+                  </button>
+                </div>
               </div>
             ) : (
               <p>No claim submitted yet.</p>
@@ -242,19 +332,23 @@ export default function App() {
         )}
 
         {activeTab === "appeal" && (
-          <div style={{ padding: 30 }}>
+          <div style={{ padding: 30, fontFamily: "'Crimson Text', serif", fontSize: "20px" }}>
             <h2 style={{ color: "#1a237e" }}>⚖️ Appeal Claim</h2>
-            {appealed ? <p>Your appeal has been submitted for review.</p> : <p>No appeal made yet.</p>}
+            {appealed ? (
+              <p>Your appeal has been submitted for review.</p>
+            ) : (
+              <p>No appeal made yet.</p>
+            )}
           </div>
         )}
 
         {activeTab === "about" && (
-          <div style={{ padding: 30 }}>
+          <div style={{ padding: 30, fontFamily: "'Crimson Text', serif", fontSize: "20px" }}>
             <h2 style={{ color: "#1a237e" }}>ℹ️ About Mullai</h2>
             <p>
-              Mullai helps communities and officials analyze land claims under the Forest Rights Act. 
-              Users can select a land location, state the purpose of use, and get decisions based on rules 
-              and AI analysis. Claims can also be appealed for review.
+              Mullai helps communities and officials analyze land claims under the Forest Rights Act. Users can
+              select a land location, state the purpose of use, and get decisions based on rules and AI analysis.
+              Claims can also be appealed for review.
             </p>
           </div>
         )}
@@ -262,4 +356,3 @@ export default function App() {
     </div>
   );
 }
-
