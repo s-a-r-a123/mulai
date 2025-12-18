@@ -1,6 +1,5 @@
 # MULLAI: Smart Land Solutions
 
-<img width="601" height="601" alt="Image" src="https://github.com/user-attachments/assets/2b41d289-3a74-470a-a5c2-6f3678b6271e" />
 
 <img width="280" height="118" alt="Image" src="https://github.com/user-attachments/assets/9b6198ca-b9f4-47af-b2ed-075fca5e3f7f" />
 
@@ -14,6 +13,7 @@
 ![Image](https://github.com/user-attachments/assets/d1289d60-0919-4fb9-92ce-215a3c58ed62)
 
 <img width="1852" height="703" alt="Image" src="https://github.com/user-attachments/assets/a7137e68-f0bc-4571-87d0-a0035ecc8621" />
+
 
 
 
